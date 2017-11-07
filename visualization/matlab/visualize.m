@@ -29,19 +29,21 @@ if isnumeric(indices)
     end
 end
 
-if exist('../result/', 'dir') ~= 7
-	mkdir '../result/'
+scriptDir = fileparts(mfilename('fullpath'));
+resultDir = [scriptDir, '/../result/'];
+if exist(resultDir, 'dir') ~= 7
+	mkdir(resultDir)
 end
 
 for index = indices
     voxel = squeeze(voxels(index,:,:,:,:));
     fig = voxel_render(voxel, step, threshold, visibility, 'front');
     if ~visibility
-        saveas(fig,['../result/' outputprefix '_' num2str(index) '_front.bmp']);
+        saveas(fig,[resultDir outputprefix '_' num2str(index) '_front.bmp']);
     end
     fig = voxel_render(voxel, step, threshold, visibility, 'side');
     if ~visibility
-        saveas(fig,['../result/' outputprefix '_' num2str(index) '_side.bmp']);
+        saveas(fig,[resultDir outputprefix '_' num2str(index) '_side.bmp']);
     end
 end
 
