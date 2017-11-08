@@ -7,6 +7,7 @@ import sys
 from PIL import Image
 from torch.autograd import Variable
 from torchvision import transforms
+import numpy as np
 
 from model import Model, summary
 
@@ -48,24 +49,31 @@ def main():
     args = parser.parse_args()
     args.normalize_mean = [0.485, 0.456, 0.406]
     args.normalize_std = [0.229, 0.224, 0.225]
-    logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(args.log_level))
+    log_level = logging.getLevelName(args.log_level)
+    logging.basicConfig(stream=sys.stdout, level=log_level)
     logger.info('Running with args %s', vars(args))
 
     if not os.path.isdir(args.output_dir):
         os.mkdir(args.output_dir)
 
+    # input image
     img = load_image(args.imgname)
     img = preprocess(args.normalize_mean, args.normalize_std, scale_dim=args.imgdim)(img)
     img = img.unsqueeze(0)
     img = Variable(img)
 
+    # run model
     model = Model()
-    summary(model, img, file=WriteLog(logger, logging.DEBUG))
+    model.eval()
+    if log_level <= logging.DEBUG:
+        summary(model, img, file=WriteLog(logger, logging.DEBUG))
     output = model(img)
-    output = output.data.numpy()
+    output = output.squeeze(1)
+    output = output.data.numpy().astype(np.double)
 
+    # store output
     savepath = os.path.join(args.output_dir, os.path.splitext(args.imgname)[0] + '.mat')
-    scipy.io.savemat(savepath, {'voxels': output})
+    scipy.io.savemat(savepath, {'voxels': output, 'args': args})
     logger.info('Saved to %s', savepath)
 
 
