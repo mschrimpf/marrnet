@@ -1,20 +1,22 @@
 import sys
 from collections import OrderedDict
 
+import os
 import torch
 from torch import nn
 from torch.autograd import Variable
 
 
-class Model(nn.Module):
+class MarrNet(nn.Module):
     def __init__(self, cuda=False):
-        super(Model, self).__init__()
-        from models.step1 import step1
-        from models.step2 import step2
+        super(MarrNet, self).__init__()
+        from marrnet.models.step1 import step1
+        from marrnet.models.step2 import step2
         self.step1 = step1
-        self.step1.load_state_dict(torch.load('models/step1.pth'))
         self.step2 = step2
-        self.step2.load_state_dict(torch.load('models/step2.pth'))
+        script_dir = os.path.join(os.path.dirname(__file__), 'models')
+        self.step1.load_state_dict(torch.load(os.path.join(script_dir, 'step1.pth')))
+        self.step2.load_state_dict(torch.load(os.path.join(script_dir, 'step2.pth')))
         self.silhouette_threshold = 30
         if cuda is not False:
             self.cuda(cuda if cuda is not True else None)

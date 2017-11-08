@@ -9,7 +9,7 @@ from torch.autograd import Variable
 from torchvision import transforms
 import numpy as np
 
-from model import Model, summary
+from marrnet import MarrNet, summary
 
 
 class WriteLog(object):
@@ -40,7 +40,6 @@ def preprocess(normalize_mean, normalize_std, scale_dim=256):
 
 
 def main():
-    logger = logging.getLogger()
     parser = argparse.ArgumentParser('MarrNet')
     parser.add_argument('--imgname', type=str, default='image/chair_1.png')
     parser.add_argument('--imgdim', type=int, default=256)
@@ -51,6 +50,7 @@ def main():
     args.normalize_std = [0.229, 0.224, 0.225]
     log_level = logging.getLevelName(args.log_level)
     logging.basicConfig(stream=sys.stdout, level=log_level)
+    logger = logging.getLogger()
     logger.info('Running with args %s', vars(args))
 
     if not os.path.isdir(args.output_dir):
@@ -63,7 +63,7 @@ def main():
     img = Variable(img)
 
     # run model
-    model = Model()
+    model = MarrNet()
     model.eval()
     if log_level <= logging.DEBUG:
         summary(model, img, file=WriteLog(logger, logging.DEBUG))
