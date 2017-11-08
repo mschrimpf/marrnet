@@ -1,10 +1,8 @@
+import sys
 from collections import OrderedDict
 
-import sys
 import torch
 from torch import nn
-import numpy as np
-
 from torch.autograd import Variable
 
 
@@ -35,8 +33,8 @@ class Model(nn.Module):
         silhouette_mask = torch.le(silhouette, self.silhouette_threshold)
 
         # TODO: solve this within PyTorch. Work around in-place limitation
-        masked_normal = np.zeros(normal.size())
-        masked_depth = np.zeros(depth.size())
+        masked_normal = normal.data.numpy()
+        masked_depth = depth.data.numpy()
         silhouette_mask = silhouette_mask.data.numpy().astype(bool)
         for i in range(3):
             masked_normal[:, i, :, :][silhouette_mask] = 100
