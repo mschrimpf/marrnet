@@ -5,6 +5,7 @@ import os
 import torch
 from torch import nn
 from torch.autograd import Variable
+from torchvision import transforms
 
 
 class MarrNet(nn.Module):
@@ -42,6 +43,15 @@ class MarrNet(nn.Module):
             masked_normal[:, i, :, :][silhouette_mask] = 100
         masked_depth[:, 0, :, :][silhouette_mask] = 0
         return torch.cat((Variable(torch.FloatTensor(masked_normal)), Variable(torch.FloatTensor(masked_depth))), 1)
+
+
+def preprocess(normalize_mean=[0.485, 0.456, 0.406], normalize_std=[0.229, 0.224, 0.225], scale_dim=256):
+    return transforms.Compose([
+        transforms.Scale(scale_dim),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=normalize_mean, std=normalize_std),
+        lambda img: img.unsqueeze(0)
+    ])
 
 
 def summary(model, x, file=sys.stdout):

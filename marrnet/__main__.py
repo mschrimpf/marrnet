@@ -1,15 +1,14 @@
 import argparse
 import logging
 import os
-
-import scipy.io
 import sys
+
+import numpy as np
+import scipy.io
 from PIL import Image
 from torch.autograd import Variable
-from torchvision import transforms
-import numpy as np
 
-from marrnet import MarrNet, summary
+from marrnet import MarrNet, summary, preprocess
 
 
 class WriteLog(object):
@@ -30,15 +29,6 @@ def load_image(path):
     return Image.open(path)
 
 
-def preprocess(normalize_mean, normalize_std, scale_dim=256):
-    preprocess = transforms.Compose([
-        transforms.Scale(scale_dim),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=normalize_mean, std=normalize_std)
-    ])
-    return preprocess
-
-
 def main():
     parser = argparse.ArgumentParser('MarrNet')
     parser.add_argument('--imgname', type=str, default='image/chair_1.png')
@@ -50,6 +40,7 @@ def main():
     args.normalize_std = [0.229, 0.224, 0.225]
     log_level = logging.getLevelName(args.log_level)
     logging.basicConfig(stream=sys.stdout, level=log_level)
+    logging.getLogger("PIL").setLevel(logging.WARNING)
     logger = logging.getLogger()
     logger.info('Running with args %s', vars(args))
 
@@ -59,7 +50,6 @@ def main():
     # input image
     img = load_image(args.imgname)
     img = preprocess(args.normalize_mean, args.normalize_std, scale_dim=args.imgdim)(img)
-    img = img.unsqueeze(0)
     img = Variable(img)
 
     # run model
