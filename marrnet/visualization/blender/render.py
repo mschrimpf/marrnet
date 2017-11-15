@@ -21,8 +21,8 @@ def render_file(ifilename, ofile_path, ofile_prefix, ofile_ext, views=[[240, 0, 
     os.system('rm ' + tempfilename)
     if not os.path.isdir(ofile_path):
         os.system('mkdir -p ' + ofile_path)
-    return render_mat(mat, method, ofile_ext, color, ofile_path, ofile_prefix, overwrite, pooling_step, resolution,
-                      views)
+    return render_mat(mat=mat, method=method, ofile_ext=ofile_ext, ofile_path=ofile_path, ofile_prefix=ofile_prefix,
+                      overwrite=overwrite, pooling_step=pooling_step, resolution=resolution, color=color, views=views)
 
 
 def render_mat(mat, ofile_path, ofile_prefix, ofile_ext, views=[[240, 0, 0], [150, -150, 75], [0, 240, 50]],
